@@ -21,7 +21,7 @@ function createFallingText() {
   text.className = "falling-text";
   text.textContent = texts[Math.floor(Math.random() * texts.length)];
   text.style.left = `${Math.random() * window.innerWidth}px`;
-  text.style.transform = `translateZ(${(Math.random() - 0.5) * 300}px)`; // giảm 3D
+  text.style.transform = `translateZ(${(Math.random() - 0.5) * 300}px)`;
   scene.appendChild(text);
 
   setTimeout(() => {
@@ -42,35 +42,33 @@ function createFallingIcon() {
   }, 6000);
 }
 
-// Giới hạn số lượng phần tử trong scene
 setInterval(() => {
   if (scene.childElementCount < 40) {
     createFallingText();
     createFallingIcon();
   }
-}, 300); // Giảm tần suất
+}, 300);
 
 function playMusicOnce() {
   if (audio.paused) {
-    audio.currentTime = 48; 
+    audio.currentTime = 48; // Tua đến thời điểm 48s
     audio.play().catch(e => {
-      console.warn("Audio bị trình duyệt chặn. Đợi tương tác từ người dùng.");
+      console.warn("Audio bị chặn bởi trình duyệt:", e);
     });
   }
 
+  // Gỡ sự kiện sau khi phát
   document.removeEventListener("click", playMusicOnce);
   document.removeEventListener("touchstart", playMusicOnce);
 }
 
-document.addEventListener("click", playMusicOnce);
-document.addEventListener("touchstart", playMusicOnce);
+// Chỉ phát khi người dùng click hoặc chạm (đảm bảo hoạt động trên điện thoại)
+document.addEventListener("click", playMusicOnce, { once: true });
+document.addEventListener("touchstart", playMusicOnce, { once: true });
 
-window.addEventListener("load", () => {
-  audio.currentTime = 48; 
-  audio.play().catch(() => {});
-});
+// KHÔNG dùng autoplay trong window.onload nữa, để tránh bị chặn
 
-// Drag 3D effect
+// Drag xoay scene 3D
 let isDragging = false;
 let lastTouch = { x: 0, y: 0 };
 let lastMove = 0;
@@ -125,6 +123,7 @@ document.addEventListener("touchmove", (e) => {
   scene.style.transform = `rotateX(${rotateX}deg) rotateY(${rotateY}deg)`;
 }, { passive: false });
 
+// Hiệu ứng sparkle nền
 function createSparkles(count = 40) {
   for (let i = 0; i < count; i++) {
     const s = document.createElement("div");
